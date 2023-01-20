@@ -1,0 +1,8 @@
+① laravel_bbs プロジェクトのディレクトリに移動 
+cd laravel_bbs 
+② Laravel の開発用サーバを起動
+php artisan serve --port=$PORT
+③ phpmyadminの起動
+php -S 0.0.0.0:8880 -t ~/environment/phpmyadmin 
+④ tinkerの起動
+php artisan tinker 
