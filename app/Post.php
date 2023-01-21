@@ -17,7 +17,7 @@ class Post extends Model
     }
     
     public function scopeRecommend($query, $self_id){
-        // ランダムに３つの投稿を取得
-        return $query->where('user_id', '=', $self_id)->inRandomOrder()->limit(3);
+        // 最新10件取得
+        return $query->where('user_id', '=', $self_id)->latest()->limit(10);
     }
 }
