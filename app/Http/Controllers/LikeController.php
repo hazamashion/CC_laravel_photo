@@ -9,8 +9,10 @@ class LikeController extends Controller
     // いいね一覧
     public function index()
     {
+        $like_posts = \Auth::user()->likePosts;
         return view('likes.index', [
           'title' => 'いいね一覧',
+          'like_posts' => $like_posts,
         ]);
     }
  

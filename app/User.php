@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Follow;
 
 class User extends Authenticatable
 {
@@ -43,5 +44,30 @@ class User extends Authenticatable
     
     public function scopeRecommend($query, $self_id){
         return $query->where('id', '!=', $self_id)->latest()->limit(3);
+    }
+    //いいね機能のためのn:mのリレーション
+    public function likes(){
+        return $this->hasMany('App\Like');
+    }
+ 
+    public function likePosts(){
+        return $this->belongsToMany('App\Post', 'likes');
+    }
+    //フォロー機能のためのリレーション
+    public function follows(){
+        return $this->hasMany('App\Follow');
+    }
+    
+    public function follow_users(){
+        return $this->belongsToMany('App\User', 'follows', 'user_id', 'follow_id');
+    }
+    
+    public function followers(){
+        return $this->belongsToMany('App\User', 'follows', 'follow_id', 'user_id');
+    }
+    //該当のユーザーが特定のユーザーをフォローしているかどうかをチェックする。
+    public function isFollowing($user){
+        $result = $this->follow_users->pluck('id')->contains($user->id);
+        return $result;
     }
 }

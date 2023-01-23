@@ -20,4 +20,19 @@ class Post extends Model
         // 最新10件取得
         return $query->where('user_id', '=', $self_id)->latest()->limit(10);
     }
+    //いいね機能のためのn:mのリレーション
+    public function likes(){
+      return $this->hasMany('App\Like');
+    }
+    
+    public function likedUsers(){
+      return $this->belongsToMany('App\User', 'likes');
+    }
+    
+    public function isLikedBy($user){
+        $liked_users_ids = $this->likedUsers->pluck('id');
+        $result = $liked_users_ids->contains($user->id);
+        
+        return $result;
+    }
 }

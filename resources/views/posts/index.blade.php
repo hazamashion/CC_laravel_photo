@@ -5,9 +5,24 @@
 @section('content')
     <h1>{{ $title }}</h1>
     <h2>おすすめユーザー</h2>
-    <ul class="recommend_users">
-        @forelse($recommend_users as $recommend_user)
-            <li><a href="{{ route('users.show', $recommend_user) }}">{{ $recommend_user->name }}</a></li>
+    <ul class="recommended_users">
+        @forelse($recommended_users as $recommended_user)
+            <li>
+                <a href="{{ route('users.show', $recommended_user) }}">{{ $recommended_user->name }}</a>
+                @if(Auth::user()->isFollowing($recommended_user))
+                    <form method="post" action="{{ route('follows.destroy', $recommended_user) }}" class="follow">
+                        @csrf
+                        @method('delete')
+                        <input type="submit" value="フォロー解除">
+                    </form>
+                @else
+                    <form method="post" action="{{ route('follows.store') }}" class="follow">
+                        @csrf
+                        <input type="hidden" name="follow_id" value="{{ $recommended_user->id }}">
+                        <input type="submit" value="フォロー">
+                    </form>
+                @endif
+            </li>
         @empty
             <li>おすすめユーザーはいません。</li>
         @endforelse
@@ -36,6 +51,11 @@
                             </div>
                         </div>
                         <div class="post_body_footer">
+                            <a class="like_button">{{ $post->isLikedBy(Auth::user()) ? '★' : '☆' }}</a>
+                            <form method="post" class="like" action="{{ route('posts.toggle_like', $post) }}">
+                                @csrf
+                                @method('patch')
+                            </form>
                             [<a href="{{ route('posts.edit', $post) }}">編集</a>]
                             <form method="post" class="delete" action="{{ route('posts.destroy', $post) }}">
                                 @csrf
@@ -44,29 +64,38 @@
                             </form>
                         </div>
                     </div>
+                    <div class="post_comments">
+                        <span class="post_comments_header">コメント</span>
+                        <ul class="post_comments_body">
+                            @forelse($post->comments as $comment)
+                                <li>{{ $comment->user->name }}: {{ $comment->body }}</li>
+                            @empty
+                                <li>コメントはありません。</li>
+                            @endforelse                        
+                        </ul>
+                    </div>
+                    <form method="post" action="{{ route('comments.store') }}">
+                        @csrf
+                        <input type="hidden" name="post_id" value="{{ $post->id }}">
+                        <label>
+                            コメントを追加：
+                            <input type="text" name="body">
+                        </label>
+                        <input type="submit" value="送信">
+                    </form>
                 </div>
-                <div class="post_comments">
-                    <span class="post_comments_header">コメント</span>
-                    <ul class="post_comments_body">
-                        @forelse($post->comments as $comment)
-                            <li>{{ $comment->user->name }}: {{ $comment->body }}</li>
-                        @empty
-                            <li>コメントはありません。</li>
-                        @endforelse                        
-                    </ul>
-                </div>
-                <form method="post" action="{{ route('comments.store') }}">
-                    @csrf
-                    <input type="hidden" name="post_id" value="{{ $post->id }}">
-                    <label>
-                        コメントを追加：
-                        <input type="text" name="body">
-                    </label>
-                    <input type="submit" value="送信">
-                </form>
             </li>
         @empty
             <li>書き込みはありません。</li>
         @endforelse
   </ul>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+    /* global $ */
+    $('.like_button').each(function(){
+        $(this).on('click', function(){
+            $(this).next().submit();
+        });
+    });
+  </script>
 @endsection

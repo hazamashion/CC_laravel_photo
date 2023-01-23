@@ -56,3 +56,28 @@
   padding:0;
   list-style: none;
 }
+/*いいねボタン*/
+.like_button {
+  cursor: pointer;
+}
+.like {
+  display: inline;
+}
+.like_post {
+    background-color: #dccaca;
+    border-top: solid 1px #e67c2e;
+    border-bottom: solid 1px #e67c2e;
+}
+.like_post .post_body_heading {
+    background-color: #dccaca;
+}
+.like_post .post_comments {
+    background-color: #e4d6c7;
+}
+.like_post .like_button {
+    color: yellow;
+}
+/*いいねボタン*/
+.follow {
+  cursor: pointer;
+}

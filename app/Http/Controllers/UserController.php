@@ -67,7 +67,7 @@ class UserController extends Controller
     {
         $user = User::find($id);
         $collection = Post::recommend($user->id)->get();
-        $recommend_posts = $collection->random(3);
+        $recommend_posts = $collection->random(2);
         
         return view('users.show', [
           'title' => 'プロフィール',

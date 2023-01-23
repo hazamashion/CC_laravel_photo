@@ -44,3 +44,5 @@ Route::patch('/users/edit_image', 'UserController@updateImage')->name('users.upd
 Route::resource('users', 'UserController')->only([
     'show',
 ]);
+
+Route::patch('/posts/{post}/toggle_like', 'PostController@toggleLike')->name('posts.toggle_like');
