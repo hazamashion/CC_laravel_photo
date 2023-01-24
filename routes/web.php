@@ -20,12 +20,12 @@ Route::resource('posts', 'PostController');
 Route::resource('likes', 'LikeController')->only([
     'index', 'store', 'destroy'
 ]);
-
+//フォローに関するルーティング
 Route::resource('follows', 'FollowController')->only([
     'index', 'store', 'destroy'
 ]);
-
 Route::get('/follower', 'FollowController@followerIndex');
+Route::get('/mutual_follow', 'FollowController@mutualFollowIndex');
 
 Auth::routes();
 

@@ -49,6 +49,19 @@ class FollowController extends Controller
           'followers' => $followers,
         ]);
     }
+    //相互フォロー一覧
+    public function mutualFollowIndex()
+    {
+        $follow_users = \Auth::user()->follow_users;
+        
+        $follow_users_ids = $follow_users->pluck('id');
+        $mutual_follow_users = \Auth::user()->followers()->whereIn('user_id', $follow_users_ids)->get();
+        
+        return view('follows.mutual_follow_index', [
+            'title' => '相互フォロー一覧',
+            'mutual_follow_users' => $mutual_follow_users,
+        ]);
+    }
     
     public function __construct(){
         
