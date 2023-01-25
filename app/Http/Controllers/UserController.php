@@ -7,6 +7,7 @@ use App\Post;
 use Illuminate\Http\Request;
 use App\Http\Requests\ProfileRequest;
 use App\Http\Requests\ProfileImageRequest;
+use App\Services\FileUploadService;
 
 
 class UserController extends Controller
@@ -37,16 +38,10 @@ class UserController extends Controller
         ]);
     }
     
-    public function updateImage(ProfileImageRequest $request){
+    public function updateImage(ProfileImageRequest $request, FileUploadService $service){
         
         //画像投稿処理
-        $path =  '';
-        $image = $request->file('image');
-        
-        if( isset($image) === true ){
-            //publicディスク(storage/app/public/)のphotosディレクトリに保存
-            $path = $image->store('photos', 'public');
-        }
+        $path = $service->saveImage($request->file('image'));
         
         $user = User::find(\Auth::user()->id);
         

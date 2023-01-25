@@ -7,6 +7,7 @@ use App\User;
 use App\Like;
 use App\Http\Requests\PostRequest;
 use App\Http\Requests\PostImageRequest;
+use App\Services\FileUploadService;
 
 class PostController extends Controller
 {
@@ -18,7 +19,7 @@ class PostController extends Controller
     public function index(){
         $user = \Auth::user();
         $follow_user_ids = $user->follow_users->pluck('id');
-        $user_posts = $user->posts()->orWhereIn('user_id', $follow_user_ids )->latest()->get();
+        $user_posts = $user->posts()->orWhereIn('user_id', $follow_user_ids )->latest()->paginate(5);
         return view('posts.index', [
             'title' => '投稿一覧',
             'posts' => $user_posts,
@@ -44,15 +45,18 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(PostRequest $request)
-    {
-        //画像投稿処理
+    private function saveImage($image){
         $path = '';
-        $image = $request->file('image');
         if( isset($image) === true ){
-            //publicディスク（storage/app/public/)のphotosディレクトリに保存
             $path = $image->store('photos', 'public');
         }
+        return $path; //存在しない場合は空文字
+    }
+    
+    public function store(PostRequest $request, FileUploadService $service)
+    {
+        //画像投稿処理
+        $path = $service->saveImage($request->file('image'));
         
         Post::create([
             'user_id' => \Auth::user()->id,
@@ -83,9 +87,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Post $post)
     {
-        $post = Post::find($id);
+        // $post = Post::find($post); //不要になる！
         return view('posts.edit', [
           'title' => '投稿編集',
           'post' => $post,
@@ -141,16 +145,10 @@ class PostController extends Controller
         ]);   
     }
     //画像変更処理
-    public function updateImage($id, PostImageRequest $request){
+    public function updateImage($id, PostImageRequest $request, FileUploadService $service){
         
         //画像投稿処理
-        $path = '';
-        $image = $request->file('image');
-        
-        if( isset($image) ===  true ){
-            //publicディスク(storage/app/public/)のphotosディレクトリに保存
-            $path = $image->store('photos', 'public');
-        }
+        $path = $service->saveImage($request->file('image'));
         
         $post = Post::find($id);
         

@@ -60,4 +60,5 @@
             <li>書き込みはありません。</li>
         @endforelse
     </ul>
+    {{ $like_posts->links() }}
 @endsection
