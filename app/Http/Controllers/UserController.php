@@ -51,7 +51,7 @@ class UserController extends Controller
         }
         
         $user->update([
-            'image' => $path,//ファイルをテーブルに保存？
+            'image' => $path,
         ]);
         
         session()->flash('success', '画像を変更しました。');
